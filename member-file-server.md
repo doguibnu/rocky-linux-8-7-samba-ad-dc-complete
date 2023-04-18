@@ -1,20 +1,19 @@
 # Rocky Linux 8.7
 ## Membro e Servidor de Arquivos do AD
 
-"Rocky Linux é um sistema operacional comunitário desenvolvido para ser 100% compatível bug a bug com o Enterprise Linux, agora que o CentOS mudou de direção."
 
 Após a instalação do sistema operacional, seguir com os comandos para a instalação e configuração do samba como membro e servidor de arquivos. 
 
 
-**Atualizar o sistema:**
+Atualizar o sistema:
 ```
-yum update
+yum update -y && yum upgrade -y
 ```
-**Instalar os pacotes do samba necessários para samba e servidor de arquivos:**
+Instalar os pacotes do samba necessários para samba e servidor de arquivos:
 ```
 yum install samba samba-winbind samba-winbind-clients
 ```
-**Habilitar os serviços para iniciar junto ao boot do sistema:**
+Habilitar os serviços para iniciar junto ao boot do sistema:
 ```
 systemctl enable smb nmb winbind
 ```
@@ -212,7 +211,7 @@ Address: 10.1.1.31
 nslookup IP-serverad
 ```
 
-Antes de prosseguir, conectar seu DC1 e criar um grupo e um usuário. No DC1 faça o comando pra criar o grupo:
+Antes de prosseguir, conectar seu **DC1** e criar um grupo e um usuário. No DC1 faça o comando pra criar o grupo:
 ```
 samba-tool group add 'Linux Domain'
 ```
