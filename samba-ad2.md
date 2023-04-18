@@ -1,39 +1,34 @@
 ## Configurar Samba AD (DC2) Replicador Rocky Linux 8.7
 
 Update do sistema:
-
 ```
 yum update -y && yum upgrade -y
 ```
 
 Instalar o editor de texto **nano**:
-
 ```
 dnf install nano
 ```
 
 Verificar sua **configuração de rede** e **DNS**, bem como **nome de domínio**. Uma das formas: Abra um **terminal** e chamar o **nmtui**:
-
 ```
  nmtui
 ```
 
 Selecione **Editar uma conexão**. Então a opção **Editar**. Verificar ou alterar seu **endereço ip** e máscara de **sub-rede** e seu **Gateway**. 
 
-Na opção **Servidor DNS**: inserir preferencialmente o ip de seu **Controlador de Domínio Principal** (seu **DC1**).
+Na opção **Servidor DNS**: inserir PREFERENCIALMENTE o ip de seu **Controlador de Domínio Principal** (seu **DC1**).
 
  Não esquecer de inserir em **Domínios de pesquisa:** **seu.domínio**. Vá até o fim e selecione **OK** para salvar. Selecione **Voltar** e então no menu, **selecionar** a opção: 
 
 **Definir nome de máquina do sistema**: dc2.seu.dominio. Agora selecione a opção: **OK** para salvar. Novamente selecione **OK**. Deve retornar para o terminal.
 
-Editar o arquivo **/etc /host**
-
+Editar o arquivo **/etc /host**:
 ```
 nano /etc/hosts
 ```
 
 Inserir os dados referentes ao seu servidor de **Controlador de Domínio 2:**
-
 ```
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
@@ -44,22 +39,18 @@ Inserir os dados referentes ao seu servidor de **Controlador de Domínio 2:**
 **Salvar o arquivo**
 
 
-
 Veririficar se existe algum processo do samba rodando:
-
 ```
-# ps ax | egrep "samba|smbd|nmbd|winbindd"
+ ps ax | egrep "samba|smbd|nmbd|winbindd"
 ```
 
 Remover qualquer configuração smb.conf que houver, checando com o comando:
-
 ```
 # smbd -b | grep "CONFIGFILE"
    CONFIGFILE: /usr/local/samba/etc/samba/smb.conf
 ```
 
 Remover todos arquivos de data base que houver. como ***.tdb** e ***.ldb**, listando com o comando:
-
 ```
 # smbd -b | egrep "LOCKDIR|STATEDIR|CACHEDIR|PRIVATE_DIR"
   LOCKDIR: /usr/local/samba/var/lock/
@@ -69,13 +60,11 @@ Remover todos arquivos de data base que houver. como ***.tdb** e ***.ldb**, list
 ```
 
 Remover o arquivo **/etc/krb5.conf** se houver, com o comando:
-
 ```
 rm /etc/krb5.conf
 ```
 
-Habilitar repositório **PowerTools** com os comandos abaixo:
-
+Instalar plugins e habilitar repositório **PowerTools** com os comandos abaixo:
 ```
 dnf install dnf-plugins-core
 dnf install epel-release
@@ -84,13 +73,12 @@ dnf update
 ```
 
 Checar os repositórios adicionados com o comando:
-
 ```
 dnf repolist
 ```
 
 O resultado deve ser algo como:
-
+```
 id do repo nome do repo
 appstream Rocky Linux 8 - AppStream
 baseos Rocky Linux 8 - BaseOS
@@ -99,23 +87,21 @@ devel Rocky Linux 8 - Devel WARNING! FOR BUILDROOT AND KOJI USE
 - **epel Extra Packages for Enterprise Linux 8 - x86_64**
 - **extras Rocky Linux 8 - Extras**
 - **powertools Rocky Linux 8 - PowerTools**
+```
 
-## Setar o a hora local
+## Setar a hora local:
 
 Listando as opções de hora local.
-
 ```
 timedatectl list-timezones
 ```
 
 Para setar o timezone desejado, usar o comando: 
-
 ```
 timedatectl set-timezone America/Sao_Paulo 
 ```
 
 Verificando o timezone setado:
-
 ```
 timedatectl
 
@@ -129,13 +115,11 @@ System clock synchronized: yes
 ```
 
 Instalar as dependências dos pacotes para instalar e compilar o **samba AD-DC**. No **terminal** fazer um arquivo do tipo script executável e inserir os comandos:
-
 ```
 nano depende.sh
 ```
 
 Inserir os comandos:
-
 ```
 set -xueo pipefail
 
@@ -259,37 +243,31 @@ yum clean all
 **Salvar o arquivo**
 
 Transformar o arquivo em um executável:
-
 ```
 chmod +x depende.sh
 ```
 
 Executar o aquivo com o comando:
-
 ```
 ./depende.sh
 ```
 
 Fazer download da última versão do **samba** com o comando:
-
 ```
 wget https://download.samba.org/pub/samba/stable/samba-4.18.0.tar.gz
 ```
 
 Descompcatar o arquivo baixado com o comando:
-
 ```
 tar -zxvf samba-nome-arquivo
 ```
 
 Mudar para o diretório onde foi descompactado:
-
 ```
 cd samba-nome-arquivo/
 ```
 
 Compilar o samba para que o arquivo de configuação **smb.conf** ficar em:  **/etc/samba/smb.conf**:
-
 ```
 ./configure --sysconfdir=/etc/samba/
 ```
@@ -297,19 +275,16 @@ Compilar o samba para que o arquivo de configuação **smb.conf** ficar em:  **/
 Aguarde o procedimento terminar.
 
 Executar make e make install:
-
 ```
 make && make install
 ```
 
 Fazer com que o comando **samba-tool** possa ser chamado na raíz do sistema. No diretório **/root** editar o arquivo **.bash_profile:**
-
 ```
 nano .bash_profile
 ```
 
 E inserir a linha:
-
 ```
 # User specific environment and startup programs
 PATH=$PATH:$HOME/bin
@@ -325,20 +300,17 @@ export PATH
 ## Criar um arquivo de serviço systemd.
 
 Executar os comandos:
-
 ```
 # systemctl mask smbd nmbd winbind
 # systemctl disable smbd nmbd winbind
 ```
 
 Criar o arquivo em `/etc/systemd/system/samba-ad-dc.service`
-
 ```
 nano /etc/systemd/system/samba-ad-dc.service
 ```
 
 Com as seguintes linhas:
-
 ```
 [Unit]
 Description=Samba Active Directory Domain Controller
@@ -357,31 +329,26 @@ WantedBy=multi-user.target
 **Salvar o arquivo**
 
 Recarrregar o `systemd` com o comando:
-
 ```
 systemctl daemon-reload
 ```
 
 Habilitar o `samba-ad-dc` para iniciar no boot do sistema:
-
 ```
 systemctl enable samba-ad-dc
 ```
 
 Reestart o serviço do samba-ad-dc com o comando:
-
 ```
 systemctl restart samba-ad-dc
 ```
 
 Para parar serviço fazer o comando:
-
 ```
 systemctl stop samba-ad-dc
 ```
 
 Se necessitar desabilitar o serviço, utilizar o comando:
-
 ```
 systemctl disable samba-ad-dc
 ```
@@ -389,31 +356,119 @@ systemctl disable samba-ad-dc
 ## Configurar o Firewall
 
  Adicionar serviços:
-
 ```
 firewall-cmd --add-service={dns,ldap,ldaps,kerberos}
 ```
 
 Adicionar portas:
-
 ```
 firewall-cmd --add-port={389/udp,135/tcp,135/udp,138/udp,138/tcp,137/tcp,137/udp,139/udp,139/tcp,445/tcp,445/udp,3268/udp,3268/tcp,3269/tcp,3269/udp,49152/tcp}
 ```
 
 Recarregar o Firewall:
-
 ```
 firewall-cmd --reload
 ```
 
 Copiar o arquivo **krb5.conf** para o diretório **/etc**:
-
 ```
 cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
 ```
 
- Juntando-se ao **Active Directory (DC1)** a partir do (**DC2**)  = controlador de dominio 2. Substitua **seu.domínio** para seus dados:
+Editar o arquivo **krb5.conf**:
+```
+nano /etc/krb5.conf
+```
+Alterar para estas linhas apenas com seus dados:
+```
+[libdefaults]
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
+    default_realm = SEU.DOMINIO
+```
 
+Fazer um backup do arquivo smb.conf:
+```
+mv /etc/samba/smb.conf /etc/samba/smb.conf.org
+```
+
+Criar um arquio **user.map** no diretório /etc/samba:
+```
+nano /etc/samba/user.map
+```
+Com o conteúdo:
+```
+!root = DOMINIO\Administrator
+```
+
+Editar um novo arquivo smb.conf:
+```
+nano /etc/samba/smb.conf
+```
+
+Inserindo o conteúdo e alterando para suas configurações:
+```
+[global]
+  
+ workgroup = DOMINIO
+ security = ADS  
+ realm = SEU.DOMINIO
+ bind interfaces only = yes  
+ min domain uid = 0
+
+ #logs  
+ log file = /var/log/samba/%m.log  
+ log level = 1
+
+ #objects  
+ vfs objects = acl_xattr  
+ map acl inherit = Yes  
+
+ #keytabs  
+ dedicated keytab file = /etc/krb5.keytab  
+ kerberos method = secrets and keytab
+
+ #winbind dominio default  
+ winbind use default domain = yes
+ winbind refresh tickets = Yes
+
+ #idmaps  
+ idmap config * : backend = tdb  
+ idmap config * : range = 3000-7999
+ idmap config DOMINIO backend = rid
+ idmap config DOMINIO : range = 10000-999999
+
+ #usermap  
+ username map = /etc/samba/user.map
+
+ #template para login shell e diretorio home  
+ template shell = /bin/bash  
+ template homedir = /home/%U
+```
+**Salvar o arquivo**
+
+Executar o comando **testparm** para verificação de erros de sintaxe:
+```
+testparm
+```
+A saída do comando pode ser parecido com essa:
+```
+Load smb config files from /etc/samba/smb.conf
+Loaded services file OK.
+Weak crypto is allowed
+
+Server role: ROLE_DOMAIN_MEMBER
+
+Press enter to see a dump of your service definitions
+```
+
+Reinciar o samba ad-dc
+```
+smbcontrol all reload-config
+```
+
+Juntando-se ao **Active Directory (DC1)** a partir do (**DC2**)  = controlador de dominio 2. Substitua **seu.domínio** para seus dados:
 ```
 samba-tool domain join seu.dominio DC -Uadministrator --realm=seu.dominio
 ```
+Com o comando acima o DC2 deve juntar-se ao DC1.
