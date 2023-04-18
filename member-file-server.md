@@ -116,13 +116,13 @@ nano /etc/samba/smb.conf
 	kerberos method = secrets and keytab
 	log file = /var/log/samba/%m.log
 	min domain uid = 0
-	realm = PRUDE.PR
+	realm = SEU.DOMINIODE
 	security = ADS
 	template homedir = /home/%U
 	template shell = /bin/bash
 	winbind refresh tickets = Yes
 	winbind use default domain = Yes
-	workgroup = PRUDE
+	workgroup = DOMINIO
 	idmap config dominio : range = 10000-999999
 	idmap config dominio : backend = rid
 	idmap config * : range = 3000-7999
