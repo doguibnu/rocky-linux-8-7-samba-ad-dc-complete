@@ -1,25 +1,34 @@
-## Como configurar Samba AD-DC (DC1) Rocky Linux 8.7
-
+## Como configurar Samba AD-DC (DC1) Controlador de Domínio Rocky Linux 8.7
 
 Update do sistema:
 ```
 yum update -y && yum upgrade -y 
 ```
 
-Instalar o editor **nano***:
+Instalar o editor de texto **nano***:
 ```
 dnf install nano
 ```
 
-Verificar sua **configuração de rede** e **DNS**, bem como **nome de domínio**. Uma das formas: Abra um **terminal** e chamar nmtui:
+Verificar sua **configuração de rede** e **DNS**, bem como **nome de domínio**. Uma das formas: Abra um **terminal** e chame o nmtui:
 ```
  nmtui
 ```
 
-Selecione **Editar uma conexão**. Então a opção **Editar**. Verificar ou alterar seu **endereço ip** e máscara de **sub-rede** e seu **Gateway**. Na opção **Servidor DNS**: inserir o DNS desejado. Não esquecer de inserir em **Domínios de pesquisa:** **seu.domínio**. Vá até o fim e selecione **OK** para salvar. Selecione **Voltar** e então no menu, **selecionar** a opção: **Definir nome de máquina do sistema**: dc1.seu.dominio. Agora selecione a opção: **OK** para salvar. Novamente selecione **OK**. Deve retornar para o terminal.
+Selecione **Editar uma conexão**. Então a opção **Editar**.
+
+Verificar ou alterar seu **endereço ip** e máscara de **sub-rede** e seu **Gateway**. 
+
+Na opção **Servidor DNS**: inserir o DNS desejado. Não esquecer de inserir em **Domínios de pesquisa:** **seu.domínio**.
+
+Vá até o fim e selecione **OK** para salvar.
+
+Selecione **Voltar** e então no menu: **selecionar** a opção: **Definir nome de máquina do sistema**: dc1.seu.dominio. 
+
+Agora selecione a opção: **OK** para salvar. Novamente selecione **OK**. Deve retornar para o terminal.
 
 
-Editar o arquivo **/etc /host**:
+Editar o arquivo **/etc/host**:
 ```
 nano /etc/hosts
 ```
@@ -65,7 +74,7 @@ Remover o arquivo **/etc/krb5.conf** se houver, com o comando:
 rm /etc/krb5.conf
 ```
 
-Instalar plugins habilitar o repositório PowerTools com os comandos abaixo:
+Instalar plugins e habilitar o repositório PowerTools com os comandos abaixo:
 ```
 dnf install dnf-plugins-core
 dnf install epel-release
@@ -73,21 +82,22 @@ dnf config-manager --set-enabled powertools
 dnf update
 ```
 
-Checar os repositórios adicionado com o comando:
+Checar os repositórios adicionados com o comando:
 ```
 dnf repolist
 ```
 
 O resultado deve ser algo como:
-
+```
 id do repo nome do repo
 appstream Rocky Linux 8 - AppStream
 baseos Rocky Linux 8 - BaseOS
 devel Rocky Linux 8 - Devel WARNING! FOR BUILDROOT AND KOJI USE
 
-- **epel Extra Packages for Enterprise Linux 8 - x86_64**
-- **extras Rocky Linux 8 - Extras**
-- **powertools Rocky Linux 8 - PowerTools**
+- epel Extra Packages for Enterprise Linux 8 - x86_64
+- extras Rocky Linux 8 - Extras
+- powertools Rocky Linux 8 - PowerTools
+```
 
 
  ## Setar a hora local (ntp):
@@ -106,6 +116,17 @@ Verificando o timezone setado:
 ```
 timedatectl
 ```
+O resultado deve parecer como abaixo:
+```
+Local time: qua 2023-04-12 09:04:22 -03
+           Universal time: qua 2023-04-12 12:04:22 UTC
+                 RTC time: qua 2023-04-12 12:00:16
+                Time zone: America/Sao_Paulo (-03, -0300)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no 
+```
+
 
 Instalar as dependências dos pacotes. Fazer um arquivo do tipo script executável e inserir os comandos:
 ```
@@ -260,7 +281,7 @@ Mudar para o diretório onde foi descompactado:
 cd samba-nome-arquivo/
 ```
 
-Compilar o samba  para o arquivo de configuração ficar em **/etc/samba/smb.conf** com o comando:
+Compilar o samba para o arquivo de configuração ficar em: **/etc/samba/smb.conf** com o comando:
 ```
 ./configure --sysconfdir=/etc/samba/
 ```
@@ -270,11 +291,6 @@ Aguarde o processo finalizar.
 E então faça os comandos make e make install:
 ```
 make && make install
-```
-
-Configurar Kerberos:
-```
-cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
 ```
 
 No diretório **/root** edite o arquivo **.bash_profile**
@@ -293,7 +309,7 @@ PATH=/usr/local/samba/bin/:/usr/local/samba/sbin/:$PATH
 export PATH
 ```
 
-**Salvar o arquivo***
+**Salvar o arquivo**
 
 ## Criar um arquivo de serviço systemd.
 
@@ -303,7 +319,7 @@ Executar os comandos:
 # systemctl disable smbd nmbd winbind
 ```
 
-Criar o arquivo em `/etc/systemd/system/samba-ad-dc.service`
+Criar o arquivo em: `/etc/systemd/system/samba-ad-dc.service`
 ```
 nano /etc/systemd/system/samba-ad-dc.service
 ```
@@ -324,9 +340,9 @@ ExecReload=/bin/kill -HUP $MAINPID
 WantedBy=multi-user.target
 ```
 
-**Salvar o arquivo***
+**Salvar o arquivo**
 
-Recarrregar o `systemd`  com o comando:
+Recarrregar o `systemd` com o comando:
 ```
 systemctl daemon-reload
 ```
@@ -334,6 +350,47 @@ systemctl daemon-reload
 Habilitar o `samba-ad-dc` para iniciar no boot do sistema:
 ```
 systemctl enable samba-ad-dc
+```
+
+Verificar em qual dispositivo de rede está sua conexão:
+```
+ip a
+```
+O resultado deve ser parecido com isso:
+```
+2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether de:1e:07:63:42:51 brd ff:ff:ff:ff:ff:ff
+    altname enp0s18
+    inet 10.1.1.31/24 brd 10.1.1.255 scope global noprefixroute ens18
+```
+**OBS**: o **ens18** neste caso é seu dispositivo
+
+
+**Reestart o sistema:**
+```
+reboot
+```
+
+Vamos Provisionar o Samba. Abrir um **terminal:**
+```
+samba-tool domain provision --use-rfc2307 --interactive --option="interfaces= lo ens18" --option="bind interfaces only=yes"
+```
+ Responda as questões referente sua configuração:
+ ```
+ Realm: SEU.Dominio 
+ Domain [AD]: Domínio  
+ Server Role (dc, member, standalone) [dc]: dc 
+ DNS backend (SAMBA_INTERNAL, BIND9_FLATFILE, BIND9_DLZ, NONE) SAMBA_INTERNAL]: SAMBA_INTERNAL 
+ DNS forwarder IP address (write 'none' to disable forwarding) [SEU_IP_DNS]:IP DNS  
+ Administrator password: escolher uma senha  
+ Retype password: repetir a mesma senha
+```
+**OBS: Guarde a senha de provisionamento**
+
+
+Configurar Kerberos:
+```
+cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
 ```
 
 Reestart o serviço do samba-ad com o comando:
@@ -389,35 +446,10 @@ klist
 ```
 
 Com a resposta parecida com essa:
-
+```
 Valid starting       Expires              Service principal
 13/04/2023 13:54:57  13/04/2023 23:54:57  krbtgt/SEU.DOMINIO@SEU.DOMINIO
     renew until 14/04/2023 13:54:50
-
-
-## Setar o a hora local
-
-Listando as opções de hora local:
-```
-timedatectl list-timezones
-```
-
-Para setar o timezone desejado, usar o comando:
-```
-timedatectl set-timezone America/Sao_Paulo 
-```
-
-Verificando o timezone setado:
-```
-timedatectl
-
-Local time: qua 2023-04-12 09:04:22 -03
-           Universal time: qua 2023-04-12 12:04:22 UTC
-                 RTC time: qua 2023-04-12 12:00:16
-                Time zone: America/Sao_Paulo (-03, -0300)
-System clock synchronized: yes
-              NTP service: active
-          RTC in local TZ: no 
 ```
 
 ## Configurar o Firewall
@@ -437,6 +469,9 @@ Recarregar o Firewall:
 firewall-cmd --reload
 ```
 
+### Para Criar um Segundo DC, clique [aqui](https://github.com/doguibnu/rocky-linux-8-7-samba-ad-dc-complete/blob/main/samba-ad2.md)
+
+
 #### Replicação do SysVol (backup do AD) para um DC2
 
 Gerar uma chave SSH-Keygen no **DC1** com o comando:
@@ -453,9 +488,10 @@ Entre com uma senha (ou apenas digite **enter** para ficar sem senha), teclar **
 Entre com a senha novamente: teclar **enter**
 
 A saída será algo como:
-
+```
 Your identification has been saved in /root/.ssh/id_rsa.
 Your **public key** has been saved in **/root/.ssh/id_rsa.pub**.
+```
 
 Quando a chave for criada, copiar para o servidor que será o **segundo DC2** com o comando:
 ```
@@ -525,10 +561,10 @@ Com o resultado positivo, pode-se rodar o comando sem a opção **--dry-run**:
 rsync -XAavz --delete-after --progress --stats /usr/local/samba/var/locks/sysvol/ dc2@IP-DC2:/usr/local/samba/var/locks/sysvol/
 ```
 
-Para automatizar o processo, inserir o comando no **crontab**. Para aprender mais sobre o crontab clique [aqui](https://www.hostinger.com.br/tutoriais/cron-job-guia?ppc_campaign=google_search_generic_hosting_all&bidkw=defaultkeyword&lo=1031952&gclid=CjwKCAjw__ihBhADEiwAXEazJsMs2yOLBskI2NlzC9qK_ovK0G1a9KsbBpIfWGsKR49S0-V8Fa2mHBoCZJsQAvD_BwE)
+Para automatizar o processo, inserir o comando no **crontab**. Para aprender mais sobre o crontab clique[aqui](https://www.hostinger.com.br/tutoriais/cron-job-guia?ppc_campaign=google_search_generic_hosting_all&bidkw=defaultkeyword&lo=1031952&gclid=CjwKCAjw__ihBhADEiwAXEazJsMs2yOLBskI2NlzC9qK_ovK0G1a9KsbBpIfWGsKR49S0-V8Fa2mHBoCZJsQAvD_BwE)
 
 
-Adicionar uma agenda no crontab com o comando:
+Adicionar um script no crontab com o comando:
 ```
 crontab -e
 ```
