@@ -1,21 +1,17 @@
-## Configurar Samba AD-DC (DC1) Rocky Linux 8.7
-
+## Como configurar Samba AD-DC (DC1) Rocky Linux 8.7
 
 
 Update do sistema:
-
 ```
 yum update -y && yum upgrade -y 
 ```
 
 Instalar o editor **nano***:
-
 ```
 dnf install nano
 ```
 
-Verificar sua **configuração de rede** e **DNS**, bem como **nome de domínio**. Uma das formas: Abra um **terminal** e digite:
-
+Verificar sua **configuração de rede** e **DNS**, bem como **nome de domínio**. Uma das formas: Abra um **terminal** e chamar nmtui:
 ```
  nmtui
 ```
@@ -23,15 +19,12 @@ Verificar sua **configuração de rede** e **DNS**, bem como **nome de domínio*
 Selecione **Editar uma conexão**. Então a opção **Editar**. Verificar ou alterar seu **endereço ip** e máscara de **sub-rede** e seu **Gateway**. Na opção **Servidor DNS**: inserir o DNS desejado. Não esquecer de inserir em **Domínios de pesquisa:** **seu.domínio**. Vá até o fim e selecione **OK** para salvar. Selecione **Voltar** e então no menu, **selecionar** a opção: **Definir nome de máquina do sistema**: dc1.seu.dominio. Agora selecione a opção: **OK** para salvar. Novamente selecione **OK**. Deve retornar para o terminal.
 
 
-
 Editar o arquivo **/etc /host**:
-
 ```
 nano /etc/hosts
 ```
 
-Inserir os dados referentes ao seu servidor 
-
+Inserir os dados referentes ao seu servidor:
 ```
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
@@ -40,30 +33,25 @@ Inserir os dados referentes ao seu servidor
 ```
 
 Onde:
-
 10.1.1.31 = IP de seu próprio AD-DC (controlador de domínio)
 
-dc1 = nome simplificado do seu **host*** de seu controlador de domínio
+dc1 = nome simplificado do seu **host** de seu controlador de domínio
 
 dc1.seu.domínio = nome do host + seu.domínio 
 
 
-
-Veririficar se existe algum processo do samba rodando: 
-
+Veririficar se existe algum processo do samba rodando:
 ```
 # ps ax | egrep "samba|smbd|nmbd|winbindd"
 ```
 
 Remover qualquer config file que houver, checando com o comando:
-
 ```
 # smbd -b | grep "CONFIGFILE"
    CONFIGFILE: /usr/local/samba/etc/samba/smb.conf
 ```
 
-Remover todos arquivos de data base que houver. como *.tdb e *.ldb, listando com o comando: 
-
+Remover todos arquivos de data base que houver. Como: *.tdb e *.ldb:  
 ```
 # smbd -b | egrep "LOCKDIR|STATEDIR|CACHEDIR|PRIVATE_DIR"
   LOCKDIR: /usr/local/samba/var/lock/
@@ -73,13 +61,11 @@ Remover todos arquivos de data base que houver. como *.tdb e *.ldb, listando com
 ```
 
 Remover o arquivo **/etc/krb5.conf** se houver, com o comando:
-
 ```
 rm /etc/krb5.conf
 ```
 
 Instalar plugins habilitar o repositório PowerTools com os comandos abaixo:
-
 ```
 dnf install dnf-plugins-core
 dnf install epel-release
@@ -88,7 +74,6 @@ dnf update
 ```
 
 Checar os repositórios adicionado com o comando:
-
 ```
 dnf repolist
 ```
@@ -104,36 +89,30 @@ devel Rocky Linux 8 - Devel WARNING! FOR BUILDROOT AND KOJI USE
 - **extras Rocky Linux 8 - Extras**
 - **powertools Rocky Linux 8 - PowerTools**
 
-## 
 
-## ## Setar o a hora local (ntp)
+ ## Setar a hora local (ntp):
 
-Listando as opções de hora local. 
-
+Listando as opções de hora local.
 ```
 timedatectl list-timezones
 ```
 
 Para setar o timezone desejado, usar o comando: 
-
 ```
 timedatectl set-timezone America/Sao_Paulo 
 ```
 
 Verificando o timezone setado:
-
 ```
 timedatectl
 ```
 
 Instalar as dependências dos pacotes. Fazer um arquivo do tipo script executável e inserir os comandos:
-
 ```
 nano depende.sh
 ```
 
 Inserir os comandos:
-
 ```
 set -xueo pipefail
 
@@ -257,37 +236,31 @@ yum clean all
 **Salvar o arquivo***
 
 Transformar o arquivo em um executável com o comando:
-
 ```
 chmod +x depende.sh
 ```
 
 Executar o aquivo com o comando:
-
 ```
 ./depende.sh
 ```
 
 Fazer download da última versão do samba ou da versão desejada: 
-
 ```
 wget https://download.samba.org/pub/samba/stable/samba-4.18.0.tar.gz
 ```
 
 Descompcatar o arquivo baixado:
-
 ```
 tar -zxvf samba-nome-arquivo
 ```
 
 Mudar para o diretório onde foi descompactado:
-
 ```
 cd samba-nome-arquivo/
 ```
 
 Compilar o samba  para o arquivo de configuração ficar em **/etc/samba/smb.conf** com o comando:
-
 ```
 ./configure --sysconfdir=/etc/samba/
 ```
@@ -295,25 +268,21 @@ Compilar o samba  para o arquivo de configuração ficar em **/etc/samba/smb.con
 Aguarde o processo finalizar.
 
 E então faça os comandos make e make install:
-
 ```
 make && make install
 ```
 
 Configurar Kerberos:
-
 ```
 cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
 ```
 
-No diretório **/root** edite o arquivo **.bash_profile** 
-
+No diretório **/root** edite o arquivo **.bash_profile**
 ```
 nano .bash_profile
 ```
 
 E inserir a linha:
-
 ```
 # User specific environment and startup programs
 PATH=$PATH:$HOME/bin
@@ -329,20 +298,17 @@ export PATH
 ## Criar um arquivo de serviço systemd.
 
 Executar os comandos:
-
 ```
 # systemctl mask smbd nmbd winbind
 # systemctl disable smbd nmbd winbind
 ```
 
 Criar o arquivo em `/etc/systemd/system/samba-ad-dc.service`
-
 ```
 nano /etc/systemd/system/samba-ad-dc.service
 ```
 
 Com as seguintes linhas:
-
 ```
 [Unit]
 Description=Samba Active Directory Domain Controller
@@ -361,67 +327,56 @@ WantedBy=multi-user.target
 **Salvar o arquivo***
 
 Recarrregar o `systemd`  com o comando:
-
 ```
 systemctl daemon-reload
 ```
 
-Habilitar o `samba-ad` para iniciar no boot do sistema:
-
+Habilitar o `samba-ad-dc` para iniciar no boot do sistema:
 ```
 systemctl enable samba-ad-dc
 ```
 
 Reestart o serviço do samba-ad com o comando:
-
 ```
 systemctl restart samba-ad-dc
 ```
 
 Para parar serviço fazer o comando:
-
 ```
 systemctl stop samba-ad-dc
 ```
 
 Se necessitar desabilitar o serviço, utilizar o comando:
-
 ```
 systemctl disable samba-ad-dc
 ```
 
-Verificar a versão do samba
-
+Verificar a versão do samba:
 ```
 smbclient --version
 ```
 
 Testar o samba com o comando:
-
 ```
 smbclient -L localhost -U%
 ```
 
-Verificar o **DNS** (_ldap)
-
+Verificar o **DNS** (_ldap):
 ```
 host -t SRV _ldap._tcp.seu.dominio
 ```
 
-Verificar **_kerberos**
-
+Verificar **_kerberos**:
 ```
  host -t SRV _kerberos._udp.seu.dominio.
 ```
 
 A Gravação A
-
 ```
 host -t A seu.dominio
 ```
 
 Verificando o Kerberos
-
 ```
 kinit Administrator
 Password for Administrator@SEU.DOMINIO:
@@ -429,7 +384,6 @@ Warning: Your password will expire in 41 days on Tue 22 Sep 2020 03:41:22 PM IST
 ```
 
 Listar o cache dos tickets
-
 ```
 klist
 ```
@@ -440,24 +394,20 @@ Valid starting       Expires              Service principal
 13/04/2023 13:54:57  13/04/2023 23:54:57  krbtgt/SEU.DOMINIO@SEU.DOMINIO
     renew until 14/04/2023 13:54:50
 
-## 
 
 ## Setar o a hora local
 
-Listando as opções de hora local.
-
+Listando as opções de hora local:
 ```
 timedatectl list-timezones
 ```
 
-Para setar o timezone desejado, usar o comando: 
-
+Para setar o timezone desejado, usar o comando:
 ```
 timedatectl set-timezone America/Sao_Paulo 
 ```
 
 Verificando o timezone setado:
-
 ```
 timedatectl
 
@@ -473,19 +423,16 @@ System clock synchronized: yes
 ## Configurar o Firewall
 
 Adicionar serviços:
-
 ```
 firewall-cmd --add-service={dns,ldap,ldaps,kerberos}
 ```
 
 Adicionar portas:
-
 ```
 firewall-cmd --add-port={389/udp,135/tcp,135/udp,138/udp,138/tcp,137/tcp,137/udp,139/udp,139/tcp,445/tcp,445/udp,3268/udp,3268/tcp,3269/tcp,3269/udp,49152/tcp}
 ```
 
 Recarregar o Firewall:
-
 ```
 firewall-cmd --reload
 ```
@@ -493,7 +440,6 @@ firewall-cmd --reload
 #### Replicação do SysVol (backup do AD) para um DC2
 
 Gerar uma chave SSH-Keygen no **DC1** com o comando:
-
 ```
 ssh-keygen -t rsa
 ```
@@ -512,7 +458,6 @@ Your identification has been saved in /root/.ssh/id_rsa.
 Your **public key** has been saved in **/root/.ssh/id_rsa.pub**.
 
 Quando a chave for criada, copiar para o servidor que será o **segundo DC2** com o comando:
-
 ```
 ssh-copy-id user-dc2@IP-Seu-DC2
 ```
@@ -520,13 +465,11 @@ ssh-copy-id user-dc2@IP-Seu-DC2
 Agora pode-se conectar com ssh sem requerer senha de acesso.
 
 Conecte-se via ssh em seu DC2 e mude as permissões de acesso para que o usuário do dc2 possa escrever no diretório com o comando:
-
 ```
 chown root.user-dc2 -R /usr/local/samba/var/locks/sysvol/
 ```
 
 Fazendo o backup do DC1 para o DC2. Para um teste antes, fazer o comando usando a opção **--dry-run** para apenas um teste sem alteração.
-
 ```
 rsync --dry-run -XAavz --delete-after --progress --stats /usr/local/samba/var/locks/sysvol/ user-dc2@IP-DC2:/usr/local/samba/var/locks/sysvol/
 ```
@@ -543,6 +486,7 @@ user-dc2@**IP-DC2:/usr/local/samba/var/locks/sysvol/**
 
 O resultado deve ser algo parecido com:
 
+```
 building file list ... 
 12 files to consider
 ./
@@ -574,22 +518,22 @@ Total bytes received: 51
 
 sent 2,011 bytes  received 51 bytes  1,374.67 bytes/sec
 total size is 40  speedup is 0.02 **(DRY RUN)**
+```
 
 Com o resultado positivo, pode-se rodar o comando sem a opção **--dry-run**:
-
 ```
 rsync -XAavz --delete-after --progress --stats /usr/local/samba/var/locks/sysvol/ dc2@IP-DC2:/usr/local/samba/var/locks/sysvol/
 ```
 
-Para automatizar o processo, inserir o comando no **crontab**. Para aprender mais sobre o crontab clique [aqui]([Cron Job: Guia Completo para Iniciantes 2023](https://www.hostinger.com.br/tutoriais/cron-job-guia?ppc_campaign=google_search_generic_hosting_all&bidkw=defaultkeyword&lo=1031952&gclid=CjwKCAjw__ihBhADEiwAXEazJsMs2yOLBskI2NlzC9qK_ovK0G1a9KsbBpIfWGsKR49S0-V8Fa2mHBoCZJsQAvD_BwE))
-Adicionar uma agenda no crontab com o comando:
+Para automatizar o processo, inserir o comando no **crontab**. Para aprender mais sobre o crontab clique [aqui](https://www.hostinger.com.br/tutoriais/cron-job-guia?ppc_campaign=google_search_generic_hosting_all&bidkw=defaultkeyword&lo=1031952&gclid=CjwKCAjw__ihBhADEiwAXEazJsMs2yOLBskI2NlzC9qK_ovK0G1a9KsbBpIfWGsKR49S0-V8Fa2mHBoCZJsQAvD_BwE)
 
+
+Adicionar uma agenda no crontab com o comando:
 ```
 crontab -e
 ```
 
 E insira a linha:
-
 ```
 0 12 * * 1-5 root rsync -XAavz --delete-after --progress --stats /usr/local/samba/var/locks/sysvol/ srvad2@10.1.1.38:/usr/local/samba/var/locks/sysvol/
 ```
