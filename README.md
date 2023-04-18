@@ -3,7 +3,7 @@
 # Samba AD-DC no Rocky Linux 8.7
 
 ## Máquina 01 (DC1):
-Será instalado o samba-ad-dc de modo que funcionará com um controlador de domínio (DC1) principal
+Será instalado o samba-ad-dc de modo que funcionará como um controlador de domínio (DC1) principal
 
 
 ## Máquina 02 (Membro e Servidor de Arquivos):
