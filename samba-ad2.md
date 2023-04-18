@@ -9,12 +9,20 @@ Instalar o editor de texto **nano**:
 ```
 dnf install nano
 ```
+Adicionar um usuário para que o mesmo seja utilizado como replicador do sysvol (backup do ad-dc DC1)
+```
+useradd userdc2
+```
+Adicionar senha para o usuário criado:
+```
+passwd userdc2
+```
+Insira uma senha para o usuário criado. Guarde a senha
 
 Verificar sua **configuração de rede** e **DNS**, bem como **nome de domínio**. Uma das formas: Abra um **terminal** e chamar o **nmtui**:
 ```
  nmtui
 ```
-
 Selecione **Editar uma conexão**. Então a opção **Editar**. Verificar ou alterar seu **endereço ip** e máscara de **sub-rede** e seu **Gateway**. 
 
 Na opção **Servidor DNS**: inserir PREFERENCIALMENTE o ip de seu **Controlador de Domínio Principal** (seu **DC1**).
@@ -35,9 +43,7 @@ Inserir os dados referentes ao seu servidor de **Controlador de Domínio 2:**
 # inserir os dados de seu server
 10.1.1.38   dc2                             dc2.seu.dominio
 ```
-
 **Salvar o arquivo**
-
 
 Veririficar se existe algum processo do samba rodando:
 ```
@@ -84,9 +90,9 @@ appstream Rocky Linux 8 - AppStream
 baseos Rocky Linux 8 - BaseOS
 devel Rocky Linux 8 - Devel WARNING! FOR BUILDROOT AND KOJI USE
 
-- **epel Extra Packages for Enterprise Linux 8 - x86_64**
-- **extras Rocky Linux 8 - Extras**
-- **powertools Rocky Linux 8 - PowerTools**
+- epel Extra Packages for Enterprise Linux 8 - x86_64
+- extras Rocky Linux 8 - Extras
+- powertools Rocky Linux 8 - PowerTools
 ```
 
 ## Setar a hora local:
@@ -374,78 +380,6 @@ Copiar o arquivo **krb5.conf** para o diretório **/etc**:
 ```
 cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
 ```
-
-Editar o arquivo **krb5.conf**:
-```
-nano /etc/krb5.conf
-```
-Alterar para estas linhas apenas com seus dados:
-```
-[libdefaults]
-    dns_lookup_realm = false
-    dns_lookup_kdc = true
-    default_realm = SEU.DOMINIO
-```
-
-Fazer um backup do arquivo smb.conf:
-```
-mv /etc/samba/smb.conf /etc/samba/smb.conf.org
-```
-
-Criar um arquio **user.map** no diretório /etc/samba:
-```
-nano /etc/samba/user.map
-```
-Com o conteúdo:
-```
-!root = DOMINIO\Administrator
-```
-
-Editar um novo arquivo smb.conf:
-```
-nano /etc/samba/smb.conf
-```
-
-Inserindo o conteúdo e alterando para suas configurações:
-```
-[global]
-  
- workgroup = DOMINIO
- security = ADS  
- realm = SEU.DOMINIO
- bind interfaces only = yes  
- min domain uid = 0
-
- #logs  
- log file = /var/log/samba/%m.log  
- log level = 1
-
- #objects  
- vfs objects = acl_xattr  
- map acl inherit = Yes  
-
- #keytabs  
- dedicated keytab file = /etc/krb5.keytab  
- kerberos method = secrets and keytab
-
- #winbind dominio default  
- winbind use default domain = yes
- winbind refresh tickets = Yes
-
- #idmaps  
- idmap config * : backend = tdb  
- idmap config * : range = 3000-7999
- idmap config DOMINIO backend = rid
- idmap config DOMINIO : range = 10000-999999
-
- #usermap  
- username map = /etc/samba/user.map
-
- #template para login shell e diretorio home  
- template shell = /bin/bash  
- template homedir = /home/%U
-```
-**Salvar o arquivo**
 
 Executar o comando **testparm** para verificação de erros de sintaxe:
 ```
