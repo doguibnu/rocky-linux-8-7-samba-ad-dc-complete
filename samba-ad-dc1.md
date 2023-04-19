@@ -561,7 +561,7 @@ Com o resultado positivo, pode-se rodar o comando sem a opção **--dry-run**:
 rsync -XAavz --delete-after --progress --stats /usr/local/samba/var/locks/sysvol/ dc2@IP-DC2:/usr/local/samba/var/locks/sysvol/
 ```
 
-Para automatizar o processo, inserir o comando no **crontab**. Para aprender mais sobre o crontab clique[aqui](https://www.hostinger.com.br/tutoriais/cron-job-guia?ppc_campaign=google_search_generic_hosting_all&bidkw=defaultkeyword&lo=1031952&gclid=CjwKCAjw__ihBhADEiwAXEazJsMs2yOLBskI2NlzC9qK_ovK0G1a9KsbBpIfWGsKR49S0-V8Fa2mHBoCZJsQAvD_BwE)
+Para automatizar o processo, inserir o comando no **crontab**. Para aprender mais sobre o crontab clique [aqui](https://www.hostinger.com.br/tutoriais/cron-job-guia?ppc_campaign=google_search_generic_hosting_all&bidkw=defaultkeyword&lo=1031952&gclid=CjwKCAjw__ihBhADEiwAXEazJsMs2yOLBskI2NlzC9qK_ovK0G1a9KsbBpIfWGsKR49S0-V8Fa2mHBoCZJsQAvD_BwE)
 
 
 Adicionar um script no crontab com o comando:
