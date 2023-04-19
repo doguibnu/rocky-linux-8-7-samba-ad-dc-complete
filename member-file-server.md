@@ -244,7 +244,7 @@ Se criou um disco e disponibilizou o diretório **/srv/ad** e então, indicou es
 nano /etc/samba/smb.conf
 ```
 ```
-[Rede_Arquivos]
+[arqTeste]
    path = /srv/ad/
    read only = no
    browseable = yes
@@ -255,7 +255,7 @@ Salve o arquivo
 #### Ajustando as permissões para o Grupo no diretório criado:
 
 ```
-chown root:"Domain Unix" /srv/ad
+chown root:"Domain Admins" /srv/ad
 chmod 775 -R /srv/ad
 ```
 
