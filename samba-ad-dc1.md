@@ -254,7 +254,7 @@ yum install -y \
 yum clean all 
 ```
 
-**Salvar o arquivo***
+**Salvar o arquivo**
 
 Transformar o arquivo em um executável com o comando:
 ```
@@ -271,7 +271,7 @@ Fazer download da última versão do samba ou da versão desejada:
 wget https://download.samba.org/pub/samba/stable/samba-4.18.0.tar.gz
 ```
 
-Descompcatar o arquivo baixado:
+Descompactar o arquivo baixado:
 ```
 tar -zxvf samba-nome-arquivo
 ```
@@ -490,7 +490,7 @@ Entre com a senha novamente: teclar **enter**
 A saída será algo como:
 ```
 Your identification has been saved in /root/.ssh/id_rsa.
-Your **public key** has been saved in **/root/.ssh/id_rsa.pub**.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
 ```
 
 Quando a chave for criada, copiar para o servidor que será o **segundo DC2** com o comando:
