@@ -5,7 +5,7 @@ Update do sistema:
 yum update -y && yum upgrade -y 
 ```
 
-Instalar o editor de texto **nano***:
+Instalar o editor de texto **nano**:
 ```
 dnf install nano
 ```
