@@ -11,7 +11,7 @@ yum update -y && yum upgrade -y
 ```
 Instalar os pacotes do samba necessários para samba e servidor de arquivos:
 ```
-yum install samba samba-winbind samba-winbind-clients
+dnf install samba samba-winbind samba-winbind-clients install bind-utils
 ```
 Habilitar os serviços para iniciar junto ao boot do sistema:
 ```
@@ -112,11 +112,13 @@ nano /etc/samba/smb.conf
 ```
 [global]
 	bind interfaces only = Yes
+        interfaces = lo ens18 # sua interface
 	dedicated keytab file = /etc/krb5.keytab
 	kerberos method = secrets and keytab
 	log file = /var/log/samba/%m.log
 	min domain uid = 0
-	realm = SEU.DOMINIODE
+	realm = SEU.DOMINIODE       
+        username map = /etc/samba/user.map
 	security = ADS
 	template homedir = /home/%U
 	template shell = /bin/bash
