@@ -11,7 +11,7 @@ yum update -y && yum upgrade -y
 ```
 Instalar os pacotes do samba necessários para samba e servidor de arquivos:
 ```
-dnf install samba samba-winbind samba-winbind-clients install bind-utils
+dnf install samba samba-winbind samba-winbind-clients bind-utils
 ```
 Habilitar os serviços para iniciar junto ao boot do sistema:
 ```
