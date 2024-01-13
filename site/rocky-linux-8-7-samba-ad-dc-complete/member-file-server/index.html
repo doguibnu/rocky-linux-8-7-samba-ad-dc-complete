@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Membro e Servidor de Arquivos - Rocky Linux AD-DC</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Membro e Servidor de Arquivos do AD", url: "#_top", children: [
+          ]},
+          {title: "Update e Upgrade do sistema", url: "#update-e-upgrade-do-sistema", children: [
+          ]},
+          {title: "Instalar Samba e pacotes necess\u00e1rios", url: "#instalar-samba-e-pacotes-necessarios", children: [
+          ]},
+          {title: "Configurar e editar o arquivo /etc/hosts:", url: "#configurar-e-editar-o-arquivo-etchosts", children: [
+          ]},
+          {title: "Editar o arquivo /etc/hostname", url: "#editar-o-arquivo-etchostname", children: [
+          ]},
+          {title: "Editar o arquivo /etc/nsswitch.conf", url: "#editar-o-arquivo-etcnsswitchconf", children: [
+          ]},
+          {title: "Configurar a Rede", url: "#configurar-a-rede", children: [
+          ]},
+          {title: "Arquivo user.map", url: "#arquivo-usermap", children: [
+          ]},
+          {title: "Backup do arquivo original smb.conf", url: "#backup-do-arquivo-original-smbconf", children: [
+          ]},
+          {title: "Criar um arquivo novo smb.conf", url: "#criar-um-arquivo-novo-smbconf", children: [
+          ]},
+          {title: "Backup  do arquivo krb5.conf", url: "#backup-do-arquivo-krb5conf", children: [
+          ]},
+          {title: "Criar um novo arquivo krb5.conf", url: "#criar-um-novo-arquivo-krb5conf", children: [
+          ]},
+          {title: "Comando testparm", url: "#comando-testparm", children: [
+          ]},
+          {title: "Ajustar o Firewall", url: "#ajustar-o-firewall", children: [
+          ]},
+          {title: "Juntar-se ao AD (join AD)", url: "#juntar-se-ao-ad-join-ad", children: [
+          ]},
+          {title: "", url: "#_1", children: [
+              {title: "Verificar conex\u00e3o NETLOGON", url: "#verificar-conexao-netlogon" },
+              {title: "Nslookup", url: "#nslookup" },
+              {title: "GID do grupo a partir do DC2", url: "#gid-do-grupo-a-partir-do-dc2" },
+              {title: "Garantir Privil\u00e9gios", url: "#garantir-privilegios" },
+              {title: "Ajustando Permiss\u00f5es", url: "#ajustando-permissoes" },
+              {title: "Recarregar o samba", url: "#recarregar-o-samba" },
+              {title: "RSAT Windows", url: "#rsat-windows" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav">
+      <a href="../samba-ad2/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../samba-ad2/" class="btn btn-xs btn-link">
+        Instalar Samba DC2-Replicador
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h3 id="membro-e-servidor-de-arquivos-do-ad">Membro e Servidor de Arquivos do AD</h3>
+<h3 id="update-e-upgrade-do-sistema">Update e Upgrade do sistema</h3>
+<p>Update e Upgrade do sistema. Utilizar o comando:</p>
+<pre><code>yum update -y &amp;&amp; yum upgrade -y
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="instalar-samba-e-pacotes-necessarios">Instalar Samba e pacotes necessários</h3>
+<p>Instalar o samba e seus pacotes necessários para  servidor de arquivos:</p>
+<pre><code>dnf install samba samba-winbind samba-winbind-clients bind-utils
+</code></pre>
+<p><code>Habilitar</code> os serviços <code>smb nmb e winbind</code> para iniciar junto ao boot do sistema:</p>
+<pre><code>systemctl enable smb nmb winbind
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="configurar-e-editar-o-arquivo-etchosts">Configurar e editar o arquivo <strong>/etc/hosts</strong>:</h3>
+<p>Utilizar o editor de texto <code>nano</code> para editar o arquivo <code>/etc/hosts</code></p>
+<pre><code>nano /etc/hosts
+</code></pre>
+<pre><code>127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+10.1.1.13   SRVFILE.seu.dominio SRVFILE
+::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
+</code></pre>
+<p><strong>Salvar o arquivo</strong></p>
+<p>Para salvar: <code>control+o</code> e para sair: <code>control+x</code></p>
+<p>=======================================================================</p>
+<h3 id="editar-o-arquivo-etchostname">Editar o arquivo <strong>/etc/hostname</strong></h3>
+<p>Com o editor de textos <code>nano</code> edite o arquivo <code>/etc/hostname</code> com o comando:</p>
+<pre><code>nano /etc/hostname
+</code></pre>
+<pre><code>srvfile.seu.dominio
+</code></pre>
+<p><strong>Salvar o Arquivo</strong></p>
+<p>Para salvar: <code>control+o</code> e para sair: <code>control+x</code></p>
+<p>=======================================================================</p>
+<h3 id="editar-o-arquivo-etcnsswitchconf">Editar o arquivo <strong>/etc/nsswitch.conf</strong></h3>
+<p>Com o editor de textos <code>nano</code> edite o arquivo  <strong>/etc/nsswitch.conf</strong> com o comando:</p>
+<pre><code>nano /etc/nsswitch.conf
+</code></pre>
+<p><strong>Localize as Linhas e Mude a configuração</strong></p>
+<p>De:</p>
+<pre><code>passwd: sss files systemd
+</code></pre>
+<p><strong>Para:</strong></p>
+<pre><code>passwd: files winbind
+</code></pre>
+<p>De:</p>
+<pre><code>group: sss files systemd
+</code></pre>
+<p><strong>Para</strong>:</p>
+<pre><code>group: files winbind
+</code></pre>
+<p><strong>Salve o arquivo</strong> </p>
+<p>Para salvar: <code>control+o</code> e para sair: <code>control+x</code></p>
+<p>=======================================================================</p>
+<h3 id="configurar-a-rede">Configurar a Rede</h3>
+<p>Configurar a rede e inserir dados do <code>DNS</code> do <code>AD-DC</code> ou seja, do seu controlador de domínio <code>DC1</code>. Execute o comando <code>nmtui</code>:</p>
+<pre><code>nmtui
+</code></pre>
+<p>Selecione <strong>Editar uma Conexão</strong></p>
+<p>Digite <strong>Enter</strong></p>
+<p>Com a tela <strong>Tab</strong> selecione <strong>Editar</strong></p>
+<p>Com as <strong>teclas de direção (setas)</strong> mova-se até <strong>Servidores DNS</strong> e troque o <strong>IP para o IP de seu AD DC</strong> (controlador de domínio)</p>
+<p>Ainda com as setas de direção, selecione <strong>Domínios de pesquisa</strong> e digite  a tecla <code>enter</code> para adicionar o <strong>seu.domínio</strong>.</p>
+<p>Então, selecione <strong>OK</strong> <strong>com as setas de direção e digite enter</strong>. </p>
+<p>Com a <strong>tecla Tab</strong>, selecione a opção: <strong>voltar</strong> e digite a tecla <strong>enter</strong>. Então, com a tecla <strong>Tab</strong>, selecione a <strong>opção OK</strong> e digite <strong>enter</strong></p>
+<p><strong>Reiniciar o sistema</strong>:</p>
+<pre><code>reboot
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="arquivo-usermap">Arquivo user.map</h3>
+<p>Editar o arquivo <strong>user.map</strong> no diretório <strong>/etc/samba</strong> com o conteúdo:</p>
+<pre><code>nano /etc/samba/user.map
+</code></pre>
+<pre><code>!root = DOMINIO\Administrator
+</code></pre>
+<p><strong>Salve o arquivo</strong></p>
+<p>Para salvar: <code>control+o</code> e para sair: <code>control+x</code></p>
+<p>=======================================================================</p>
+<h3 id="backup-do-arquivo-original-smbconf">Backup do arquivo original smb.conf</h3>
+<p>Criar um backup do arquivo <strong>/etc/samba/smb.conf</strong> com o comando:</p>
+<pre><code>mv /etc/samba/smb.conf /etc/samba/smb.conf.bkp
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="criar-um-arquivo-novo-smbconf">Criar um arquivo novo smb.conf</h3>
+<p>Criar um arquivo <strong>smb.conf</strong> para funcionar como <code>membro</code> e <code>servidor de arquivo</code> de modelo (<strong>rid</strong>). Execute o comando abaixo e altere as linhas para seu cenário</p>
+<pre><code>nano /etc/samba/smb.conf
+</code></pre>
+<pre><code>[global]
+    bind interfaces only = Yes
+    interfaces = lo ens18 # sua interface
+    dedicated keytab file = /etc/krb5.keytab
+    kerberos method = secrets and keytab
+    log file = /var/log/samba/%m.log
+    min domain uid = 0
+    realm = SEU.DOMINIODE       
+    username map = /etc/samba/user.map
+    security = ADS
+    template homedir = /home/%U
+    template shell = /bin/bash
+    winbind refresh tickets = Yes
+    winbind use default domain = Yes
+    workgroup = DOMINIO
+    idmap config dominio : range = 10000-999999
+    idmap config dominio : backend = rid
+    idmap config * : range = 3000-7999
+    idmap config * : backend = tdb
+    map acl inherit = Yes
+    vfs objects = acl_xattr
+</code></pre>
+<p>Salvar o arquivo</p>
+<p>Para salvar: <code>control+o</code> e para sair: <code>control+x</code></p>
+<p>=======================================================================</p>
+<h3 id="backup-do-arquivo-krb5conf">Backup  do arquivo krb5.conf</h3>
+<p>Fazer uma cópia do arquivo <strong>/etc/krb5.conf</strong></p>
+<pre><code>mv /etc/krb5.conf /etc/krb5.conf.bkp
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="criar-um-novo-arquivo-krb5conf">Criar um novo arquivo krb5.conf</h3>
+<p>Editar um novo arquivo <code>krb5.conf</code> e insira as linhas, alterando para seu cenário.</p>
+<pre><code>nano /etc/krb5.conf
+</code></pre>
+<pre><code>[libdefaults]
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
+    default_realm = SEU.DOMINIO
+</code></pre>
+<p><strong>Salvar o arquivo</strong></p>
+<p>Para salvar: <code>control+o</code>e para sair: <code>control+x</code></p>
+<p>=======================================================================</p>
+<h3 id="comando-testparm">Comando testparm</h3>
+<p>Verificar se existe algum erro de sintaxe com o comando:</p>
+<pre><code>testparm
+</code></pre>
+<p>Se não houver erros, executar o comando para recarregar o samba novamente</p>
+<pre><code>smbcontrol all reload-config
+</code></pre>
+<p>Desabilitar o <strong>SELinux:</strong></p>
+<pre><code>nano /etc/selinux/config
+</code></pre>
+<p>Na linha SELINUX=enforcing trocar para <strong>SELINUX=disabled</strong></p>
+<p><strong>Salvar o arquivo</strong></p>
+<p>Para salvar: <code>control+o</code> e para sair: <code>control+x</code></p>
+<p>=======================================================================</p>
+<h3 id="ajustar-o-firewall">Ajustar o Firewall</h3>
+<p>Ajustar o Firewall.  Adicionar o <code>serviço</code> do <code>samba</code> e recarregar o Firewall: </p>
+<pre><code>firewall-cmd --add-service=samba --permanent
+firewall-cmd --reload
+</code></pre>
+<p><strong>Reiniciar o servidor</strong>:</p>
+<pre><code>reboot
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="juntar-se-ao-ad-join-ad">Juntar-se ao AD (join AD)</h3>
+<p>Comando para juntar-se ao Domínio Criado:</p>
+<pre><code>net ads join -U administrator  
+Enter administrator's password: senha do provisionamento
+</code></pre>
+<pre><code>Using short domain name -- DOMINIO  
+Joined 'SRVFILE' to dns domain 'seu.dominio'
+</code></pre>
+<h1 id="_1"></h1>
+<p>=======================================================================</p>
+<h3 id="verificar-conexao-netlogon">Verificar conexão NETLOGON</h3>
+<p>Verificar a conexão Netlogon com o AD. Utilizar o comando:</p>
+<pre><code>wbinfo --ping-dc
+</code></pre>
+<p>O saída do comando deve parecer com esta abaixo:</p>
+<pre><code>checking the NETLOGON for domain[DOMINIO] dc connection to &quot;DC1.seu.dominio&quot; succeeded
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="nslookup">Nslookup</h3>
+<p>Verificar se o <code>Servidor DC1</code> (seu controlador de dominio) volta resposta com o comando: nslookup SEU.DOMINIO. Altere os dados conforme seu cenário</p>
+<pre><code>nslookup DC1.SEU.DOMINIO
+</code></pre>
+<p>Um resultado parecido com esse deve aparecer na tela:</p>
+<p>nslookup DC1.seu.dominio
+Server:        10.1.1.31
+Address:    10.1.1.31#53</p>
+<p>Name:    DC1.seu.dominio
+Address: 10.1.1.31</p>
+<p>E também através do  <code>IP do seu Servidor AD</code>:</p>
+<pre><code>nslookup IP-serverad
+</code></pre>
+<p>=======================================================================</p>
+<p>Antes de prosseguir, conecte em seu <strong>DC1</strong> e <code>crie</code> um <code>grupo</code> e um <code>usuário</code>. No DC1 execute o comando para criar o <code>grupo</code> por exemplo:</p>
+<pre><code>samba-tool group add 'Linux Domain'
+</code></pre>
+<p>E também <code>adicione</code> um usuário com o comando:</p>
+<pre><code>samba-tool user add 'Linux Test'
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="gid-do-grupo-a-partir-do-dc2">GID do grupo a partir do DC2</h3>
+<p>Verificar se retorna o <code>GID</code> do Grupo criado. Utilize o comando abaixo:</p>
+<pre><code>getent group &quot;DOMINIO\\Linux Domain&quot;
+linux domain:x:11115:
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="garantir-privilegios">Garantir Privilégios</h3>
+<p>Garantir privilégio de acesso. OBS: <strong>Altere o comando</strong> conforme seu cenário. Utilizar o comando:</p>
+<pre><code>net rpc rights grant &quot;DOMINIO\Domain Admins&quot; SeDiskOperatorPrivilege -U &quot;DOMINIO\Administrator&quot;
+Enter DOMINIO\Administrator password: senha CRIADA no provisionamento do DC1
+# Caso tenha criado corretamente o sistema irá dar sucesso do comando
+
+Successfully granted rights.
+</code></pre>
+<p>Chegando nesse ponto, está apto a iniciar a configuração da <code>montagem de disco</code>, o <code>diretório</code> escolhido para abrigar seus arquivos,  bem como, ajustar as <code>permissões</code> de acesso para que seja possível fazer as alterações via <code>RSAT do Windows</code> com as devidas permissões.</p>
+<hr />
+<p><strong>Por Exemplo</strong>:</p>
+<p>Se criou um disco e disponibilizou o diretório <strong>/srv/ad</strong> é necessário indicar esse caminho em seu arquivo <code>/etc/samba/smb.conf</code> ou seja, após a sessão <strong>global</strong>,  indicando o <code>nome de seu compartilhamento</code> do servidor de arquivos, <code>caminho</code> e ajustar as permissões de acesso seguindo o exemplo abaixo:</p>
+<p><code>OBS: Altere os dados conforme seu cenário</code></p>
+<pre><code>nano /etc/samba/smb.conf
+</code></pre>
+<pre><code>[arqTeste]
+   path = /srv/ad/
+   read only = no
+   browseable = yes
+</code></pre>
+<p>Salve o arquivo</p>
+<p>Para salvar: <code>control+o</code> e  para sair: <code>control+x</code> </p>
+<h4 id="_2"></h4>
+<p>=======================================================================</p>
+<h3 id="ajustando-permissoes">Ajustando Permissões</h3>
+<p>Ajustando as permissões para o Grupo no diretório criado. Utilize os comandos:</p>
+<pre><code>chown root:&quot;Domain Admins&quot; /srv/ad
+chmod 0770 -R /srv/ad
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="recarregar-o-samba">Recarregar o samba</h3>
+<p>Recarregar novamente o smbcontrol</p>
+<pre><code>smbcontrol all reload-config
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="rsat-windows">RSAT Windows</h3>
+<p>Através do Windows, logue-se com a conta <code>Administrator</code> e através do RSAT inicie suas configurações desejadas.</p>
+<p><img alt="ad-win-42a" src="https://user-images.githubusercontent.com/38897311/232552064-cf5763de-fe67-42d2-ac32-fe2b16138afd.png" /></p>
+<p>Espero poder ter ajudado. Muito Obrigado</p>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav">
+      <a href="../samba-ad2/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../samba-ad2/" class="btn btn-xs btn-link">
+        Instalar Samba DC2-Replicador
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/doguibnu/rocky-linux-8-7-samba-ad-dc-complete/edit/main/docs/rocky-linux-8-7-samba-ad-dc-complete/member-file-server.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
