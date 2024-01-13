@@ -1,0 +1,24 @@
+site_name: Rocky Linux AD-DC
+
+nav:
+  - Início: 'index.md'
+  - 'Instalar Samba DC1': 'rocky-linux-8-7-samba-ad-dc-complete/samba-ad-dc1.md'
+  - 'Instalar Samba DC2-Replicador': 'rocky-linux-8-7-samba-ad-dc-complete/samba-ad2.md'
+  - 'Membro e Servidor de Arquivos': 'rocky-linux-8-7-samba-ad-dc-complete/member-file-server.md'
+# extra_css:
+#  - stylesheets/extra.css
+theme:
+  name: windmill #alabaster  #gitbook  #material
+  locale: pt_BR
+  language: pt-BR
+  font:
+    text: Rubik
+  palette:
+   primary: deep orange
+  features:
+    - navigation.instant
+  icon:
+    repo: fontawesome/brands/github
+
+repo_url: https://github.com/doguibnu/rocky-linux-8-7-samba-ad-dc-complete
+edit_uri: edit/main/docs

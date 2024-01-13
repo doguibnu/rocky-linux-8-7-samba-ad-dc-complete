@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Instalar Samba DC1 - Rocky Linux AD-DC</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Configurar Samba AD-DC (DC1) Controlador de Dom\u00ednio", url: "#_top", children: [
+          ]},
+          {title: "Configurar a Rede", url: "#configurar-a-rede", children: [
+          ]},
+          {title: "Editar o arquivo /etc/host:", url: "#editar-o-arquivo-etchost", children: [
+          ]},
+          {title: "Veririficar processo do Samba", url: "#veririficar-processo-do-samba", children: [
+          ]},
+          {title: "Remover o arquivo /etc/krb5.conf", url: "#remover-o-arquivo-etckrb5conf", children: [
+          ]},
+          {title: "Instalar Plugins", url: "#instalar-plugins", children: [
+          ]},
+          {title: "Setar a hora local (ntp):", url: "#setar-a-hora-local-ntp", children: [
+          ]},
+          {title: "Instalar as depend\u00eancias dos pacotes.", url: "#instalar-as-dependencias-dos-pacotes", children: [
+          ]},
+          {title: "Fazer download do Samba", url: "#fazer-download-do-samba", children: [
+          ]},
+          {title: "Compilar o Samba", url: "#compilar-o-samba", children: [
+          ]},
+          {title: "Comandos make e make install", url: "#comandos-make-e-make-install", children: [
+          ]},
+          {title: "Servi\u00e7o Systemd Samba", url: "#servico-systemd-samba", children: [
+          ]},
+          {title: "Verificar dispositivo de rede", url: "#verificar-dispositivo-de-rede", children: [
+          ]},
+          {title: "Reboot o sistema", url: "#reboot-o-sistema", children: [
+          ]},
+          {title: "Provisionar o Samba", url: "#provisionar-o-samba", children: [
+          ]},
+          {title: "Configurar Kerberos:", url: "#configurar-kerberos", children: [
+          ]},
+          {title: "Verificar a vers\u00e3o do samba", url: "#verificar-a-versao-do-samba", children: [
+          ]},
+          {title: "Testar o samba", url: "#testar-o-samba", children: [
+          ]},
+          {title: "Verificar o DNS (_ldap)", url: "#verificar-o-dns-_ldap", children: [
+          ]},
+          {title: "Verificar _kerberos", url: "#verificar-_kerberos", children: [
+          ]},
+          {title: "A Grava\u00e7\u00e3o A", url: "#a-gravacao-a", children: [
+          ]},
+          {title: "Verificando o Kerberos", url: "#verificando-o-kerberos", children: [
+          ]},
+          {title: "Listar o cache dos tickets", url: "#listar-o-cache-dos-tickets", children: [
+          ]},
+          {title: "Configurar o Firewall", url: "#configurar-o-firewall", children: [
+          ]},
+          {title: "Para Criar um Segundo DC, clique aqui", url: "#para-criar-um-segundo-dc-clique-aqui", children: [
+          ]},
+          {title: "Replica\u00e7\u00e3o do SysVol", url: "#replicacao-do-sysvol", children: [
+          ]},
+          {title: "Script no crontab", url: "#script-no-crontab", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../samba-ad2/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../samba-ad2/" class="btn btn-xs btn-link">
+        Instalar Samba DC2-Replicador
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../.." class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../.." class="btn btn-xs btn-link">
+        Início
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h3 id="configurar-samba-ad-dc-dc1-controlador-de-dominio">Configurar Samba AD-DC (DC1) Controlador de Domínio</h3>
+<p>=======================================================================</p>
+<p>Update do sistema:</p>
+<pre><code>yum update -y &amp;&amp; yum upgrade -y 
+</code></pre>
+<p>Instalar o editor de texto <strong>nano</strong>:</p>
+<pre><code>dnf install nano
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="configurar-a-rede">Configurar a Rede</h3>
+<p>Verificar sua <strong>configuração de rede</strong> e <strong>DNS</strong>, bem como <strong>nome de domínio</strong>. Uma das formas: Abra um <strong>terminal</strong> e execute o comando <code>nmtui</code>:</p>
+<pre><code> nmtui
+</code></pre>
+<hr />
+<p>Selecione <strong>Editar uma conexão</strong>. </p>
+<p>Então a opção <strong>Editar</strong>. </p>
+<p>Verificar ou alterar seu <strong>endereço ip</strong> , máscara de <strong>sub-rede</strong> e seu <strong>Gateway</strong>. </p>
+<p>Na opção <strong>Servidor DNS</strong>: inserir o DNS desejado. </p>
+<p>Não esquecer de inserir em <strong>Domínios de pesquisa:</strong> <strong>seu.domínio</strong>. </p>
+<p>Vá até o fim e selecione <strong>OK</strong> para salvar. </p>
+<p>Selecione <strong>Voltar</strong> e então no menu: <strong>selecionar</strong> a opção: <strong>Definir nome de máquina do sistema</strong>:<code>dc1.seu.dominio</code>. </p>
+<p>Agora selecione a opção: <strong>OK</strong> para salvar. Novamente selecione <strong>OK</strong>. Deve retornar para o terminal.</p>
+<p>=======================================================================</p>
+<h3 id="editar-o-arquivo-etchost">Editar o arquivo <strong>/etc/host</strong>:</h3>
+<pre><code>nano /etc/hosts
+</code></pre>
+<p>Inserir os dados referentes ao seu servidor:</p>
+<pre><code>127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+# inserir os dados de seu server
+10.1.1.31    dc1                            dc1.seu.dominio
+</code></pre>
+<p>Onde:</p>
+<p><strong>10.1.1.31</strong> = IP de seu próprio AD-DC (controlador de domínio)</p>
+<p><strong>dc1</strong> = nome simplificado do seu <strong>host</strong> de seu controlador de domínio</p>
+<p><strong>dc1.seu.domínio</strong> = nome do host + seu.domínio </p>
+<p>=======================================================================</p>
+<h3 id="veririficar-processo-do-samba">Veririficar processo do Samba</h3>
+<p>Verificar se existe algum processo do samba rodando:</p>
+<pre><code># ps ax | egrep &quot;samba|smbd|nmbd|winbindd&quot;
+</code></pre>
+<p>Remover qualquer config file que houver, checando com o comando:</p>
+<pre><code># smbd -b | grep &quot;CONFIGFILE&quot;
+   CONFIGFILE: /usr/local/samba/etc/samba/smb.conf
+</code></pre>
+<p>Remover todos arquivos de data base que houver. Como: <em>.tdb e </em>.ldb:  </p>
+<pre><code># smbd -b | egrep &quot;LOCKDIR|STATEDIR|CACHEDIR|PRIVATE_DIR&quot;
+  LOCKDIR: /usr/local/samba/var/lock/
+  STATEDIR: /usr/local/samba/var/locks/
+  CACHEDIR: /usr/local/samba/var/cache/
+  PRIVATE_DIR: /usr/local/samba/private/
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="remover-o-arquivo-etckrb5conf">Remover o arquivo <strong>/etc/krb5.conf</strong></h3>
+<p>Remover o arquivo <strong>/etc/krb5.conf</strong> se houver, com o comando:</p>
+<pre><code>rm /etc/krb5.conf
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="instalar-plugins">Instalar Plugins</h3>
+<p>Instalar plugins e habilitar o repositório PowerTools com os comandos abaixo:</p>
+<pre><code>dnf install dnf-plugins-core
+dnf install epel-release
+dnf config-manager --set-enabled powertools
+dnf update
+</code></pre>
+<p>Checar os repositórios adicionados com o comando:</p>
+<pre><code>dnf repolist
+</code></pre>
+<p>O resultado deve ser algo como:</p>
+<pre><code>id do repo nome do repo
+appstream Rocky Linux 8 - AppStream
+baseos Rocky Linux 8 - BaseOS
+devel Rocky Linux 8 - Devel WARNING! FOR BUILDROOT AND KOJI USE
+
+- epel Extra Packages for Enterprise Linux 8 - x86_64
+- extras Rocky Linux 8 - Extras
+- powertools Rocky Linux 8 - PowerTools
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="setar-a-hora-local-ntp">Setar a hora local (ntp):</h3>
+<p>Listando as opções de hora local.</p>
+<pre><code>timedatectl list-timezones
+</code></pre>
+<p>Para setar o timezone desejado, usar o comando: </p>
+<pre><code>timedatectl set-timezone America/Sao_Paulo 
+</code></pre>
+<p>Verificando o timezone setado:</p>
+<pre><code>timedatectl
+</code></pre>
+<p>O resultado deve parecer como abaixo:</p>
+<pre><code>Local time: qua 2023-04-12 09:04:22 -03
+           Universal time: qua 2023-04-12 12:04:22 UTC
+                 RTC time: qua 2023-04-12 12:00:16
+                Time zone: America/Sao_Paulo (-03, -0300)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no 
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="instalar-as-dependencias-dos-pacotes">Instalar as dependências dos pacotes.</h3>
+<p>Instalar as dependências dos pacotes. Fazer um arquivo do tipo <code>script executável</code> e inserir os comandos:</p>
+<pre><code>nano depende.sh
+</code></pre>
+<p>Inserir as linhas abaixo para o seu arquivo:</p>
+<pre><code>set -xueo pipefail
+
+yum update -y
+yum install -y dnf-plugins-core
+yum install -y epel-release
+
+yum -v repolist all
+yum config-manager --set-enabled PowerTools -y || \
+    yum config-manager --set-enabled powertools -y
+yum config-manager --set-enabled Devel -y || \
+    yum config-manager --set-enabled devel -y
+yum update -y
+
+yum install -y \
+    --setopt=install_weak_deps=False \
+    &quot;@Development Tools&quot; \
+    acl \
+    attr \
+    autoconf \
+    avahi-devel \
+    bind-utils \
+    binutils \
+    bison \
+    ccache \
+    chrpath \
+    cups-devel \
+    curl \
+    dbus-devel \
+    docbook-dtds \
+    docbook-style-xsl \
+    flex \
+    gawk \
+    gcc \
+    gdb \
+    git \
+    glib2-devel \
+    glibc-common \
+    glibc-langpack-en \
+    glusterfs-api-devel \
+    glusterfs-devel \
+    gnutls-devel \
+    gpgme-devel \
+    gzip \
+    hostname \
+    htop \
+    jansson-devel \
+    keyutils-libs-devel \
+    krb5-devel \
+    krb5-server \
+    libacl-devel \
+    libarchive-devel \
+    libattr-devel \
+    libblkid-devel \
+    libbsd-devel \
+    libcap-devel \
+    libcephfs-devel \
+    libicu-devel \
+    libnsl2-devel \
+    libpcap-devel \
+    libtasn1-devel \
+    libtasn1-tools \
+    libtirpc-devel \
+    libunwind-devel \
+    libuuid-devel \
+    libxslt \
+    lmdb \
+    lmdb-devel \
+    make \
+    mingw64-gcc \
+    ncurses-devel \
+    openldap-devel \
+    pam-devel \
+    patch \
+    perl \
+    perl-Archive-Tar \
+    perl-ExtUtils-MakeMaker \
+    perl-JSON \
+    perl-Parse-Yapp \
+    perl-Test-Simple \
+    perl-generators \
+    perl-interpreter \
+    pkgconfig \
+    popt-devel \
+    procps-ng \
+    psmisc \
+    python3 \
+    python3-cryptography \
+    python3-devel \
+    python3-dns \
+    python3-gpg \
+    python3-iso8601 \
+    python3-libsemanage \
+    python3-markdown \
+    python3-policycoreutils \
+    python3-pyasn1 \
+    python3-setproctitle \
+    quota-devel \
+    readline-devel \
+    redhat-lsb \
+    rng-tools \
+    rpcgen \
+    rpcsvc-proto-devel \
+    rsync \
+    sed \
+    sudo \
+    systemd-devel \
+    tar \
+    tree \
+    wget \
+    which \
+    xfsprogs-devel \
+    yum-utils \
+    zlib-devel \
+    nano \
+    krb5-workstation
+
+yum clean all 
+</code></pre>
+<p><strong>Salvar o arquivo</strong></p>
+<p>Para salvar: <strong>control+o</strong>  e para sair: <strong>control+x</strong></p>
+<p>Transformar o arquivo em um executável com o comando:</p>
+<pre><code>chmod +x depende.sh
+</code></pre>
+<p>Executar o aquivo com o comando:</p>
+<pre><code>./depende.sh 
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="fazer-download-do-samba">Fazer download do Samba</h3>
+<p>Fazer download do samba ou da versão desejada, utilizando o comando:</p>
+<pre><code>wget https://download.samba.org/pub/samba/stable/samba-4.18.0.tar.gz
+</code></pre>
+<p>Descompactar o arquivo baixado:</p>
+<pre><code>tar -zxvf samba-nome-arquivo
+</code></pre>
+<p>Mudar para o diretório onde foi descompactado:</p>
+<pre><code>cd samba-nome-arquivo/
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="compilar-o-samba">Compilar o Samba</h3>
+<p>Compilar o samba e fazer o arquivo de configuração (smb.conf) ficar em: <strong>/etc/samba/smb.conf</strong> com o comando:</p>
+<pre><code>./configure --sysconfdir=/etc/samba/
+</code></pre>
+<p>Aguarde o processo finalizar.</p>
+<p>=======================================================================</p>
+<h3 id="comandos-make-e-make-install">Comandos make e make install</h3>
+<p>E então, execute os comandos <code>make</code> e <code>make install</code>:</p>
+<pre><code>make &amp;&amp; make install
+</code></pre>
+<p>Mude para o diretório <strong>/root</strong> e edite o arquivo <code>.bash_profile</code> com os comandos:</p>
+<pre><code>cd /root
+nano .bash_profile
+</code></pre>
+<p>Inserir a linha:</p>
+<pre><code># User specific environment and startup programs
+PATH=$PATH:$HOME/bin
+
+# ESTA LINHA
+PATH=/usr/local/samba/bin/:/usr/local/samba/sbin/:$PATH
+
+export PATH
+</code></pre>
+<p><strong>Salvar o arquivo</strong></p>
+<p>Para salvar: <strong>control+o</strong> e para sair: <strong>control+x</strong></p>
+<p>=======================================================================</p>
+<h3 id="servico-systemd-samba">Serviço Systemd Samba</h3>
+<p>Criar um arquivo de serviço systemd do samba</p>
+<p>Executar os comandos:</p>
+<pre><code> systemctl mask smbd nmbd winbind
+ systemctl disable smbd nmbd winbind
+</code></pre>
+<p>Criar o arquivo em: <code>/etc/systemd/system/samba-ad-dc.service</code></p>
+<pre><code>nano /etc/systemd/system/samba-ad-dc.service
+</code></pre>
+<p>Com as seguintes linhas (copie e cole para seu arquivo):</p>
+<pre><code>[Unit]
+Description=Samba Active Directory Domain Controller
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/samba/sbin/samba -D
+PIDFile=/usr/local/samba/var/run/samba.pid
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p><strong>Salvar o arquivo</strong></p>
+<p>Para salvar: <strong>control+o</strong> e para sair: <strong>control+x</strong></p>
+<p>Recarregar <code>systemd</code> com o comando:</p>
+<pre><code>systemctl daemon-reload
+</code></pre>
+<p>Habilitar o <code>samba-ad-dc</code> para iniciar no boot do sistema:</p>
+<pre><code>systemctl enable samba-ad-dc
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="verificar-dispositivo-de-rede">Verificar dispositivo de rede</h3>
+<p>Verificar em qual dispositivo de rede está sua conexão. No <code>terminal</code>execute o comando:</p>
+<pre><code>ip a
+</code></pre>
+<p>O resultado deve ser parecido com isso:</p>
+<pre><code>2: ens18: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether de:1e:07:63:42:51 brd ff:ff:ff:ff:ff:ff
+    altname enp0s18
+    inet 10.1.1.31/24 brd 10.1.1.255 scope global noprefixroute ens18
+</code></pre>
+<p><strong>OBS</strong>: o <strong>ens18</strong> neste caso é seu dispositivo</p>
+<p>=======================================================================</p>
+<h3 id="reboot-o-sistema">Reboot o sistema</h3>
+<p>Fazer um reboot do sistema com o comando:</p>
+<pre><code>reboot
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="provisionar-o-samba">Provisionar o Samba</h3>
+<p>Provisionando o Samba. No <strong>terminal</strong> execute o comando:</p>
+<p><code>Obs: não esqueça de alterar para o seu dispositivo de rede</code></p>
+<pre><code>samba-tool domain provision --use-rfc2307 --interactive --option=&quot;interfaces= lo ens18&quot; --option=&quot;bind interfaces only=yes&quot;
+</code></pre>
+<p>Responda as questões referente <strong>ao seu cenário</strong>:</p>
+<pre><code>Realm: SEU.Dominio 
+Domain [AD]: Domínio  
+Server Role (dc, member, standalone) [dc]: dc 
+DNS backend (SAMBA_INTERNAL, BIND9_FLATFILE, BIND9_DLZ, NONE) SAMBA_INTERNAL]: SAMBA_INTERNAL 
+DNS forwarder IP address (write 'none' to disable forwarding) [SEU_IP_DNS]:IP DNS  
+Administrator password: escolher uma senha  
+Retype password: repetir a mesma senha
+</code></pre>
+<p><strong>OBS: Guarde a senha de provisionamento</strong></p>
+<p>=======================================================================</p>
+<h3 id="configurar-kerberos">Configurar Kerberos:</h3>
+<p>Execute o comando abaixo:</p>
+<pre><code>cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
+</code></pre>
+<p>Reestart o serviço do samba-ad com o comando:</p>
+<pre><code>systemctl restart samba-ad-dc
+</code></pre>
+<p>Para parar serviço fazer o comando:</p>
+<pre><code>systemctl stop samba-ad-dc
+</code></pre>
+<p>Se necessitar desabilitar o serviço, utilizar o comando:</p>
+<pre><code>systemctl disable samba-ad-dc
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="verificar-a-versao-do-samba">Verificar a versão do samba</h3>
+<pre><code>smbclient --version
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="testar-o-samba">Testar o samba</h3>
+<pre><code>smbclient -L localhost -U%
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="verificar-o-dns-_ldap">Verificar o <strong>DNS</strong> (_ldap)</h3>
+<pre><code>host -t SRV _ldap._tcp.seu.dominio
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="verificar-_kerberos">Verificar <strong>_kerberos</strong></h3>
+<pre><code> host -t SRV _kerberos._udp.seu.dominio.
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="a-gravacao-a">A Gravação A</h3>
+<pre><code>host -t A seu.dominio
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="verificando-o-kerberos">Verificando o Kerberos</h3>
+<pre><code>kinit Administrator
+Password for Administrator@SEU.DOMINIO:
+Warning: Your password will expire in 41 days on Tue 22 Sep 2020 03:41:22 PM IST
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="listar-o-cache-dos-tickets">Listar o cache dos tickets</h3>
+<p>Listar o cache dos tickets com o comando:</p>
+<pre><code>klist
+</code></pre>
+<p>A resposta deve ser parecida com essa:</p>
+<pre><code>Valid starting       Expires              Service principal
+13/04/2023 13:54:57  13/04/2023 23:54:57  krbtgt/SEU.DOMINIO@SEU.DOMINIO
+    renew until 14/04/2023 13:54:50
+</code></pre>
+<p>=======================================================================</p>
+<h3 id="configurar-o-firewall">Configurar o Firewall</h3>
+<p>Adicionar serviços:</p>
+<pre><code>firewall-cmd --add-service={dns,ldap,ldaps,kerberos}
+</code></pre>
+<p>Abrir portas:</p>
+<pre><code>firewall-cmd --add-port={389/udp,135/tcp,135/udp,138/udp,138/tcp,137/tcp,137/udp,139/udp,139/tcp,445/tcp,445/udp,3268/udp,3268/tcp,3269/tcp,3269/udp,49152/tcp}
+</code></pre>
+<p>Recarregar o Firewall:</p>
+<pre><code>firewall-cmd --reload
+</code></pre>
+<h3 id="para-criar-um-segundo-dc-clique-aqui">Para Criar um Segundo DC, clique <a href="https://github.com/doguibnu/rocky-linux-8-7-samba-ad-dc-complete/blob/main/samba-ad2.md">aqui</a></h3>
+<p>=======================================================================  </p>
+<h3 id="replicacao-do-sysvol">Replicação do SysVol</h3>
+<p>Replicação do SysVol (backup do AD) para um <strong>Segundo Controlador de Domínio:</strong> DC2</p>
+<p>Gerar uma chave SSH-Keygen no primeiro Controlador de Domínio: <strong>DC1</strong> com o comando:</p>
+<pre><code>ssh-keygen -t rsa
+</code></pre>
+<p>Algumas perguntas serão feitas:</p>
+<p>Onde salvar o arquvo de chave, que neste caso: <strong>(/root/.ssh/id_rsa)</strong> teclar <strong>enter</strong></p>
+<p>Entre com uma senha (ou apenas digite <strong>enter</strong> para ficar sem senha), teclar <strong>enter</strong></p>
+<p>Entre com a senha novamente: teclar <strong>enter</strong></p>
+<p>A saída será algo como:</p>
+<pre><code>Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
+</code></pre>
+<p>Quando a chave for criada, copiar para o servidor que será o <strong>segundo DC2</strong> com o comando:</p>
+<pre><code>ssh-copy-id user-dc2@IP-Seu-DC2
+</code></pre>
+<p>Agora pode-se conectar através do <code>ssh</code> sem requerer senha de acesso.</p>
+<p>Conecte-se via ssh em seu <strong>DC2</strong> e mude as permissões de acesso para que o usuário do dc2 possa escrever no diretório, com o comando:</p>
+<pre><code>chown root.user-dc2 -R /usr/local/samba/var/locks/sysvol/
+</code></pre>
+<p>Executando um backup do <code>DC1</code> para o <code>DC2</code>. Para testar, execute o comando utilizando a opção <code>--dry-run</code> para  um teste sem alteração:</p>
+<pre><code>rsync --dry-run -XAavz --delete-after --progress --stats /usr/local/samba/var/locks/sysvol/ user-dc2@IP-DC2:/usr/local/samba/var/locks/sysvol/
+</code></pre>
+<p>O comando <strong>rsync</strong> fará uma copia do <strong>sysvol</strong> de seu <code>DC1</code> (<strong>parte1</strong>) para o <strong>sysvol</strong> de seu <code>DC2</code> (<strong>parte2</strong>):</p>
+<p><code>Parte 1:</code> </p>
+<p>rsync --dry-run -XAavz  --delete-after --progress --stats <strong>/usr/local/samba/var/locks/sysvol/</strong></p>
+<hr />
+<p><code>Parte 2:</code></p>
+<p>user-dc2@<strong>IP-DC2:/usr/local/samba/var/locks/sysvol/</strong></p>
+<p>O resultado deve ser algo parecido com:</p>
+<pre><code>building file list ... 
+12 files to consider
+./
+seu.dominio/
+seu.dominio/Policies/
+seu.dominio/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/
+seu.dominio/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/GPT.INI
+seu.dominio/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/
+seu.dominio/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/USER/
+seu.dominio/Policies/{6AC1786C-016F-11D2-945F-00C04FB984F9}/
+seu.dominio/Policies/{6AC1786C-016F-11D2-945F-00C04FB984F9}/GPT.INI
+seu.dominio/Policies/{6AC1786C-016F-11D2-945F-00C04FB984F9}/MACHINE/
+seu.dominio/Policies/{6AC1786C-016F-11D2-945F-00C04FB984F9}/USER/
+seu.dominio/scripts/
+
+Number of files: 12 (reg: 2, dir: 10)
+Number of created files: 9 (reg: 2, dir: 7)
+Number of deleted files: 0
+Number of regular files transferred: 2
+Total file size: 40 bytes
+Total transferred file size: 40 bytes
+Literal data: 0 bytes
+Matched data: 0 bytes
+File list size: 0
+File list generation time: 0.038 seconds
+File list transfer time: 0.000 seconds
+Total bytes sent: 2,011
+Total bytes received: 51
+
+sent 2,011 bytes  received 51 bytes  1,374.67 bytes/sec
+total size is 40  speedup is 0.02 **(DRY RUN)**
+</code></pre>
+<p>Com o resultado positivo, utilize o comando sem a opção <strong>--dry-run</strong>:</p>
+<pre><code>rsync -XAavz --delete-after --progress --stats /usr/local/samba/var/locks/sysvol/ dc2@IP-DC2:/usr/local/samba/var/locks/sysvol/
+</code></pre>
+<p>Para automatizar o processo, inserir o comando no <strong>crontab</strong>. Para aprender mais sobre o crontab clique <a href="https://www.hostinger.com.br/tutoriais/cron-job-guia?ppc_campaign=google_search_generic_hosting_all&amp;bidkw=defaultkeyword&amp;lo=1031952&amp;gclid=CjwKCAjw__ihBhADEiwAXEazJsMs2yOLBskI2NlzC9qK_ovK0G1a9KsbBpIfWGsKR49S0-V8Fa2mHBoCZJsQAvD_BwE">aqui</a></p>
+<h3 id="script-no-crontab">Script no crontab</h3>
+<p>Adicionar um script no crontab para o backup ser automático,com o comando:</p>
+<pre><code>crontab -e
+</code></pre>
+<p>E insira a linha:</p>
+<pre><code>0 12 * * 1-5 root rsync -XAavz --delete-after --progress --stats /usr/local/samba/var/locks/sysvol/ dc2@IP-DC2:/usr/local/samba/var/locks/sysvol/
+</code></pre>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="../samba-ad2/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../samba-ad2/" class="btn btn-xs btn-link">
+        Instalar Samba DC2-Replicador
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../.." class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../.." class="btn btn-xs btn-link">
+        Início
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/doguibnu/rocky-linux-8-7-samba-ad-dc-complete/edit/main/docs/rocky-linux-8-7-samba-ad-dc-complete/samba-ad-dc1.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
