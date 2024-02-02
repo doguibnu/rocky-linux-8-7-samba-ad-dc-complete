@@ -9,15 +9,18 @@ Instalar o editor de texto **nano**:
 ```
 dnf install nano
 ```
+
 Adicionar um usuário para que o mesmo seja utilizado como replicador do sysvol (backup do ad-dc DC1)
 ```
 useradd userdc2
 ```
+
 Adicionar senha para o usuário criado:
 ```
 passwd userdc2
 ```
 Insira uma senha para o usuário criado. Guarde a senha
+
 
 Verificar sua **configuração de rede** e **DNS**, bem como **nome de domínio**. Uma das formas: Abra um **terminal** e chamar o **nmtui**:
 ```
@@ -27,9 +30,10 @@ Selecione **Editar uma conexão**. Então a opção **Editar**. Verificar ou alt
 
 Na opção **Servidor DNS**: inserir PREFERENCIALMENTE o ip de seu **Controlador de Domínio Principal** (seu **DC1**).
 
- Não esquecer de inserir em **Domínios de pesquisa:** **seu.domínio**. Vá até o fim e selecione **OK** para salvar. Selecione **Voltar** e então no menu, **selecionar** a opção: 
+Não esquecer de inserir em **Domínios de pesquisa:** **seu.domínio**. Vá até o fim e selecione **OK** para salvar. Selecione **Voltar** e então no menu, **selecionar** a opção: 
 
 **Definir nome de máquina do sistema**: dc2.seu.dominio. Agora selecione a opção: **OK** para salvar. Novamente selecione **OK**. Deve retornar para o terminal.
+
 
 Editar o arquivo **/etc /host**:
 ```
@@ -129,119 +133,55 @@ Inserir os comandos:
 ```
 set -xueo pipefail
 
-yum update -y
-yum install -y dnf-plugins-core
-yum install -y epel-release
-
-yum -v repolist all
-yum config-manager --set-enabled PowerTools -y || \
-    yum config-manager --set-enabled powertools -y
-yum config-manager --set-enabled Devel -y || \
-    yum config-manager --set-enabled devel -y
-yum update -y
+dnf install -y epel-release
+dnf config-manager --enable epel
+dnf install -y yum-utils
+dnf config-manager --set-enabled powertools
+dnf update -y
 
 yum install -y \
-    --setopt=install_weak_deps=False \
-    "@Development Tools" \
-    acl \
-    attr \
-    autoconf \
-    avahi-devel \
-    bind-utils \
-    binutils \
-    bison \
-    ccache \
-    chrpath \
-    cups-devel \
-    curl \
-    dbus-devel \
-    docbook-dtds \
-    docbook-style-xsl \
-    flex \
-    gawk \
-    gcc \
-    gdb \
-    git \
-    glib2-devel \
-    glibc-common \
-    glibc-langpack-en \
-    glusterfs-api-devel \
-    glusterfs-devel \
-    gnutls-devel \
-    gpgme-devel \
-    gzip \
-    hostname \
-    htop \
-    jansson-devel \
-    keyutils-libs-devel \
-    krb5-devel \
-    krb5-server \
-    libacl-devel \
-    libarchive-devel \
-    libattr-devel \
-    libblkid-devel \
-    libbsd-devel \
-    libcap-devel \
-    libcephfs-devel \
-    libicu-devel \
-    libnsl2-devel \
-    libpcap-devel \
-    libtasn1-devel \
-    libtasn1-tools \
-    libtirpc-devel \
-    libunwind-devel \
-    libuuid-devel \
-    libxslt \
-    lmdb \
-    lmdb-devel \
-    make \
-    mingw64-gcc \
-    ncurses-devel \
-    openldap-devel \
-    pam-devel \
-    patch \
-    perl \
-    perl-Archive-Tar \
-    perl-ExtUtils-MakeMaker \
-    perl-JSON \
-    perl-Parse-Yapp \
-    perl-Test-Simple \
-    perl-generators \
-    perl-interpreter \
-    pkgconfig \
-    popt-devel \
-    procps-ng \
-    psmisc \
-    python3 \
-    python3-cryptography \
-    python3-devel \
-    python3-dns \
-    python3-gpg \
-    python3-iso8601 \
-    python3-libsemanage \
-    python3-markdown \
-    python3-policycoreutils \
-    python3-pyasn1 \
-    python3-setproctitle \
-    quota-devel \
-    readline-devel \
-    redhat-lsb \
-    rng-tools \
-    rpcgen \
-    rpcsvc-proto-devel \
-    rsync \
-    sed \
-    sudo \
-    systemd-devel \
-    tar \
-    tree \
-    wget \
-    which \
-    xfsprogs-devel \
-    yum-utils \
-    zlib-devel \
-    nano \
-    krb5-workstation \ 
+gcc.x86_64 \
+tar \
+python36.x86_64 \
+wget \
+nano \
+perl.x86_64 perl-Parse-Yapp.noarch \
+libacl.x86_64 \
+nfs4-acl-tools.x86_64 \
+gnutls-devel.x86_64 \
+zlib.x86_64 \
+krb5-devel.x86_64 \
+krb5-server \
+libblkid.x86_64 \
+dbus-devel.x86_64 \
+jansson-devel.x86_64 \
+readline.x86_64 \
+bsdtar.x86_64 \
+docbook-dtds.noarch \
+pam-devel \
+cups \
+python3-markdown \
+patchutils.x86_64 \
+gpgme-devel \
+flex \
+python3-iso8601.noarch \
+python3-cryptography.x86_64 \
+python36-devel \
+lmdb.x86_64 \
+libarchive-devel \
+libacl-devel \
+openldap-devel \
+python3-dns \
+perl-Convert-ASN1.noarch \
+rpcgen.x86_64 \
+perl-App-cpanminus \
+popt-devel.x86_64 \
+zlib-devel.x86_64 \
+lmdb-devel.x86_64 \
+bison-devel.x86_64 \
+libtasn1-tools \
+bison \
+perl-JSON \
 
 yum clean all 
 ```
@@ -302,6 +242,7 @@ export PATH
 ```
 
 **Salvar o arquivo**
+
 
 ## Criar um arquivo de serviço systemd.
 
@@ -366,9 +307,14 @@ systemctl disable samba-ad-dc
 firewall-cmd --add-service={dns,ldap,ldaps,kerberos}
 ```
 
-Adicionar portas:
+Abrir Portas TCP:
 ```
-firewall-cmd --add-port={389/udp,135/tcp,135/udp,138/udp,138/tcp,137/tcp,137/udp,139/udp,139/tcp,445/tcp,445/udp,3268/udp,3268/tcp,3269/tcp,3269/udp,49152/tcp}
+firewall-cmd --permanent --zone=public --add-port={53/tcp,135/tcp,139/tcp,389/tcp,445/tcp,465/tcp,636/tcp,3268/tcp,3269/tcp,49152-65535/tcp};
+```
+
+Adicionar UDP:
+```
+firewall-cmd --permanent --zone=public --add-port={88/udp,123/udp,137/udp,138/udp,389/udp,464/udp};
 ```
 
 Recarregar o Firewall:
@@ -381,20 +327,47 @@ Copiar o arquivo **krb5.conf** para o diretório **/etc**:
 cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
 ```
 
-Executar o comando **testparm** para verificação de erros de sintaxe:
+Apagar o arquivo /etc/samba/smb.conf se houver, com o comando:
 ```
-testparm
+rm /etc/samba/smb.conf
 ```
-A saída do comando pode ser parecido com essa:
-```
-Load smb config files from /etc/samba/smb.conf
-Loaded services file OK.
-Weak crypto is allowed
 
-Server role: ROLE_DOMAIN_MEMBER
-
-Press enter to see a dump of your service definitions
+Editar o arquivo **/etc/nsswitch.conf** com o comando:
 ```
+nano /etc/nsswitch.conf
+```
+
+Faça as seguintes alterações:
+```
+Procure pelas linhas
+
+De:
+passwd:     files sss systemd
+
+PARA:
+passwd:     files winbind
+
+--------------------------------
+
+De:
+group:     files sss systemd
+
+PARA:
+group:     files winbind
+```
+
+Salve o arquivo: 
+
+Para salvar: `control+o` e para sair: `control+x`
+
+
+Linkar a lib: `libnss_winbind.so.2` fazendos os três comandos abaixo:
+```
+ln -s /usr/local/samba/lib/libnss_winbind.so.2 /lib64/
+ln -s /lib64/libnss_winbind.so.2 /lib64/libnss_winbind.so
+ldconfig
+```
+
 
 Reinciar o samba ad-dc
 ```
@@ -405,4 +378,10 @@ Juntando-se ao **Active Directory (DC1)** a partir do (**DC2**)  = controlador d
 ```
 samba-tool domain join seu.dominio DC -Uadministrator --realm=seu.dominio
 ```
+
+Configurar o arquivo **krb5.conf** com o comando:
+```
+cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
+```
+
 Com o comando acima o DC2 deve juntar-se ao DC1.
